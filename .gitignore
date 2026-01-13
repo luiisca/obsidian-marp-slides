@@ -5,6 +5,7 @@
 *.iml
 .idea
 
+
 # npm
 node_modules
 
@@ -26,3 +27,7 @@ tests/coverage
 vault/.obsidian
 
 lib
+
+# claude
+.claude/*
+tmpclaude-*
