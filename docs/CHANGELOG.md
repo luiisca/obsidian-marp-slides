@@ -5,6 +5,13 @@ nav_order: 99
 
 # Changelog
 
+## [0.46.1](https://github.com/samuele-cozzi/obsidian-marp-slides/compare/0.46.0...0.46.1) (2026-04-11)
+
+
+### Bug Fixes
+
+* Remove code coverage step from release workflow ([2b2fdb5](https://github.com/samuele-cozzi/obsidian-marp-slides/commit/2b2fdb52cf6830e54e826f632bd70966733008c5))
+
 ## [0.46.0](https://github.com/samuele-cozzi/obsidian-marp-slides/compare/0.45.6...0.46.0) (2026-04-11)
 
 
