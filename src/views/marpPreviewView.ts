@@ -95,7 +95,7 @@ export class MarpPreviewView extends ItemView  {
 	}
 
     async addActions() {
-        const marpCli = new MarpExport(this.settings);
+        const marpCli = new MarpExport(this.settings, this.app);
         
         this.addAction('image', 'Export as PNG', () => {
             if (this.file) {
@@ -129,17 +129,21 @@ export class MarpPreviewView extends ItemView  {
       }
     
     async displaySlides(view : MarkdownView) {
-        
+
         if (view.file != null) {
             this.file = view.file;
-            const basePath = (new FilePath(this.settings)).getCompleteFileBasePath(view.file);
+            const filePath = new FilePath(this.settings);
+            const basePath = filePath.getCompleteFileBasePath(view.file);
             const markdownText = view.data;
-            
+
+            // Convert wiki-link images to standard markdown
+            const processedMarkdown = filePath.convertImageWikiLinks(markdownText, view.file, this.app);
+
             const container = this.containerEl.children[1];
             container.empty();
-            
 
-            let { html, css } = this.marp.render(markdownText);
+
+            let { html, css } = this.marp.render(processedMarkdown);
             
             // Replace Backgorund Url for images
             html = html.replace(/(?!background-image:url\(&quot;http)background-image:url\(&quot;/g, `background-image:url(&quot;${basePath}`);

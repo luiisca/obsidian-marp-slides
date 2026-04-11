@@ -1,4 +1,4 @@
-import { Vault, normalizePath, FileSystemAdapter, TFile } from 'obsidian';
+import { Vault, normalizePath, FileSystemAdapter, TFile, App } from 'obsidian';
 import { MarpSlidesSettings } from './settings';
 
 export class FilePath  {
@@ -109,4 +109,66 @@ export class FilePath  {
         //console.log(path);
         return path;
 	}
+
+    /**
+     * Convert Obsidian wiki-link image syntax to standard Markdown.
+     * Transforms ![[image.png]] to ![image.png](path/to/image.png)
+     */
+    public convertImageWikiLinks(markdown: string, sourceFile: TFile, app: App): string {
+        // Image extensions to convert
+        const imageExtensions = /\.(png|jpg|jpeg|gif|svg|webp|bmp)$/i;
+
+        // Regex: ![[filename]] or ![[filename|alt text]]
+        const wikiLinkRegex = /!\[\[([^\]|]+?)(?:\|([^\]]*))?\]\]/g;
+
+        return markdown.replace(wikiLinkRegex, (match, filename, altText) => {
+            // Only process image files
+            if (!imageExtensions.test(filename)) {
+                return match;
+            }
+
+            // Use Obsidian's link resolver to find the file
+            const linkedFile = app.metadataCache.getFirstLinkpathDest(filename, sourceFile.path);
+
+            if (linkedFile) {
+                // Build path based on link format setting
+                let imagePath: string;
+                if (this.isAbsoluteLinkFormat(sourceFile)) {
+                    // Absolute: path from vault root
+                    imagePath = linkedFile.path;
+                } else {
+                    // Relative: path from source file's folder
+                    imagePath = this.getRelativePathFromFile(sourceFile, linkedFile);
+                }
+
+                const alt = altText || filename;
+                return `![${alt}](${imagePath})`;
+            }
+
+            // File not found - return original
+            return match;
+        });
+    }
+
+    /**
+     * Calculate relative path from source file to target file.
+     */
+    private getRelativePathFromFile(sourceFile: TFile, targetFile: TFile): string {
+        const sourceParts = sourceFile.parent?.path.split('/').filter(p => p) || [];
+        const targetParts = targetFile.path.split('/').filter(p => p);
+
+        // Find common prefix length
+        let commonLength = 0;
+        while (commonLength < sourceParts.length &&
+               commonLength < targetParts.length - 1 &&
+               sourceParts[commonLength] === targetParts[commonLength]) {
+            commonLength++;
+        }
+
+        // Build relative path
+        const upCount = sourceParts.length - commonLength;
+        const relativeParts = [...Array(upCount).fill('..'), ...targetParts.slice(commonLength)];
+
+        return relativeParts.join('/');
+    }
 }

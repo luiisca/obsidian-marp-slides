@@ -103,8 +103,8 @@ export default class MarpSlides extends Plugin {
 
 	async exportFile(type: string){
 		const file = this.app.workspace.getActiveFile();
-		if(file !== null){	
-		const marpCli = new MarpExport(this.settings);
+		if(file !== null){
+			const marpCli = new MarpExport(this.settings, this.app);
 			await marpCli.export(file,type);
 		}
 	}

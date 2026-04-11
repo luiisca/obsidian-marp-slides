@@ -1,16 +1,19 @@
 import marpCli, { CLIError, CLIErrorCode } from '@marp-team/marp-cli'
-import { TFile } from 'obsidian';
+import { TFile, App } from 'obsidian';
 import { MarpSlidesSettings } from './settings';
 import { FilePath } from './filePath';
+import { writeFileSync, readFileSync } from 'fs-extra';
 
 export class MarpCLIError extends Error {}
 
 export class MarpExport {
 
     private settings : MarpSlidesSettings;
+    private app : App | null;
 
-    constructor(settings: MarpSlidesSettings) {
+    constructor(settings: MarpSlidesSettings, app: App | null = null) {
         this.settings = settings;
+        this.app = app;
     }
 
     async export(file: TFile, type: string){
@@ -22,9 +25,20 @@ export class MarpExport {
         const resourcesPath = filesTool.getLibDirectory(file.vault);
         const marpEngineConfig = filesTool.getMarpEngine(file.vault);
 
-        if (completeFilePath != ''){            
+        // Convert wiki-link images to standard markdown before export
+        if (this.app && completeFilePath != '') {
+            try {
+                const originalContent = readFileSync(completeFilePath, 'utf-8');
+                const processedContent = filesTool.convertImageWikiLinks(originalContent, file, this.app);
+                writeFileSync(completeFilePath, processedContent, 'utf-8');
+            } catch (e) {
+                console.error('Failed to process wiki-links for export:', e);
+            }
+        }
+
+        if (completeFilePath != ''){
             //console.log(completeFilePath);
-            
+
             const argv: string[] = [completeFilePath,'--allow-local-files'];
             //const argv: string[] = ['--engine', '@marp-team/marp-core', completeFilePath,'--allow-local-files'];
 
