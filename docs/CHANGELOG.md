@@ -5,6 +5,13 @@ nav_order: 99
 
 # Changelog
 
+## [0.46.0](https://github.com/samuele-cozzi/obsidian-marp-slides/compare/0.45.6...0.46.0) (2026-04-11)
+
+
+### Features
+
+* enhance image handling by converting Obsidian wiki-link images to standard Markdown format and update MarpExport to support this functionality ([715093b](https://github.com/samuele-cozzi/obsidian-marp-slides/commit/715093b7734576edc6fd00439713bb2b951353e0))
+
 ## [0.45.6](https://github.com/samuele-cozzi/obsidian-marp-slides/compare/0.45.5...0.45.6) (2024-05-08)
 
 
