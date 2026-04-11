@@ -69,14 +69,6 @@ jobs:
           zip -r ${{ env.PLUGIN_NAME }}.zip ${{ env.PLUGIN_NAME }}
           ls
           echo "::set-output name=tag_name::$(git tag --sort version:refname | tail -n 1)"
-      - name: Test & publish code coverage
-        uses: paambaati/codeclimate-action@v3.2.0
-        env:
-          CC_TEST_REPORTER_ID: ${{secrets.CC_TEST_REPORTER_ID}}
-        with:
-          coverageCommand: npm run test
-          coverageLocations: |
-            ${{github.workspace}}/tests/coverage/lcov.info:lcov
       - name: Upload zip file
         id: upload-zip
         uses: actions/upload-release-asset@v1
